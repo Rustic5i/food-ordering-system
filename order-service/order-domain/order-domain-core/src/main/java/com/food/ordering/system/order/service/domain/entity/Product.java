@@ -4,12 +4,15 @@ import com.food.ordering.system.domain.entity.BaseEntity;
 import com.food.ordering.system.domain.valueobject.Money;
 import com.food.ordering.system.domain.valueobject.ProductId;
 
+/**
+ * Товар
+ */
 public class Product extends BaseEntity<ProductId> {
 
     private String name;
     private Money price;
 
-    public Product(ProductId productId,String name, Money price) {
+    public Product(ProductId productId, String name, Money price) {
         super.setId(productId);
         this.name = name;
         this.price = price;
@@ -21,5 +24,16 @@ public class Product extends BaseEntity<ProductId> {
 
     public Money getPrice() {
         return price;
+    }
+
+    /**
+     * Обновить с подтвержденной ценной
+     *
+     * @param name  имя товара
+     * @param price цена
+     */
+    public void updateWithConfirmedAndPrice(String name, Money price) {
+        this.name = name;
+        this.price = price;
     }
 }

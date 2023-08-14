@@ -14,6 +14,9 @@ import com.food.ordering.system.order.service.domain.valueobject.TrackingId;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Заказ
+ */
 public class Order extends AggregateRoot<OrderId> {
 
     private final CustomerId customerId;
@@ -26,6 +29,9 @@ public class Order extends AggregateRoot<OrderId> {
     private OrderStatus orderStatus;
     private List<String> failureMessages;
 
+    /**
+     * Инициализировать заказ
+     */
     public void initializedOrder() {
         setId(new OrderId(UUID.randomUUID()));
         trackingId = new TrackingId(UUID.randomUUID());
@@ -33,10 +39,71 @@ public class Order extends AggregateRoot<OrderId> {
         initializedOrderItems();
     }
 
+    /**
+     * Валидировать заказ
+     */
     public void validateOrder() {
         validateInitialOrder();
         validateTotalPrice();
         validateItemsPrice();
+    }
+
+    /**
+     * Оплатить
+     */
+    public void pay() {
+        if (orderStatus != OrderStatus.PENDING) {
+            throw new OrderDomainException("Заказ находится в некорректном состоянии для оплаты операции");
+        }
+        orderStatus = OrderStatus.PAID;
+    }
+
+    /**
+     * Одобрить
+     */
+    public void approve() {
+        if (orderStatus != OrderStatus.PAID) {
+            throw new OrderDomainException("Заказ находится в некорректном состоянии для одобрения операции");
+        }
+        orderStatus = OrderStatus.APPROVED;
+    }
+
+    /**
+     * Инициализация отмены операции
+     *
+     * @param failureMessages сообщения об ошибках
+     */
+    public void initCancel(List<String> failureMessages) {
+        if (orderStatus != OrderStatus.PAID) {
+            throw new OrderDomainException("Заказ находится в некорректном состоянии для инициализации отмены операции");
+        }
+        orderStatus = OrderStatus.CANCELLING;
+        updateFailureMessages(failureMessages);
+    }
+
+    /**
+     * Отмена операции
+     */
+    public void cancel(List<String> failureMessages) {
+        if (orderStatus != OrderStatus.CANCELLING || orderStatus == OrderStatus.PENDING) {
+            throw new OrderDomainException("Заказ находится в некорректном состоянии для отмены операции");
+        }
+        orderStatus = OrderStatus.CANCELLED;
+        updateFailureMessages(failureMessages);
+    }
+
+    /**
+     * Обновить сообщения об ошибках
+     *
+     * @param failureMessages сообщения об ошибках
+     */
+    private void updateFailureMessages(List<String> failureMessages) {
+        if (this.failureMessages != null && failureMessages != null){
+            this.failureMessages.addAll(failureMessages.stream().filter(message -> !message.isEmpty()).toList());
+        }
+        if (this.failureMessages == null){
+            this.failureMessages = failureMessages;
+        }
     }
 
     private void validateItemsPrice() {
