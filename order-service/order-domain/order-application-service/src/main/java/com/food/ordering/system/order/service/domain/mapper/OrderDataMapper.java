@@ -8,6 +8,7 @@ import com.food.ordering.system.order.service.domain.dto.create.CreateOrderComma
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderResponse;
 import com.food.ordering.system.order.service.domain.dto.create.OrderAddress;
 import com.food.ordering.system.order.service.domain.dto.create.OrderItemDTO;
+import com.food.ordering.system.order.service.domain.dto.track.TrackOrderResponse;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.entity.OrderItem;
 import com.food.ordering.system.order.service.domain.entity.Product;
@@ -22,14 +23,23 @@ import java.util.stream.Collectors;
 @Component
 public class OrderDataMapper {
 
-    public CreateOrderResponse orderToCreateOrderResponse(Order order) {
-        return CreateOrderResponse.builder()
+    public TrackOrderResponse orderToTrackOrderResponse(Order order) {
+        return TrackOrderResponse.builder()
                 .orderTrackingId(order.getTrackingId().getValue())
                 .orderStatus(order.getOrderStatus())
+                .failureMessage(order.getFailureMessages())
                 .build();
     }
 
-    public Restaurant crateOrderCommandToRestaurant(CreateOrderCommand createOrderCommand) {
+    public CreateOrderResponse orderToCreateOrderResponse(Order order, String message) {
+        return CreateOrderResponse.builder()
+                .orderTrackingId(order.getTrackingId().getValue())
+                .orderStatus(order.getOrderStatus())
+                .message(message)
+                .build();
+    }
+
+    public Restaurant createOrderCommandToRestaurant(CreateOrderCommand createOrderCommand) {
         return Restaurant.builder()
                 .restaurantId(new RestaurantId(createOrderCommand.getRestaurantId()))
                 .products(createOrderCommand.getItems()
@@ -42,7 +52,7 @@ public class OrderDataMapper {
 
     }
 
-    public Order crateOrderCommandToOrder(CreateOrderCommand createOrderCommand) {
+    public Order createOrderCommandToOrder(CreateOrderCommand createOrderCommand) {
         return Order.builder()
                 .customerId(new CustomerId(createOrderCommand.getCustomerId()))
                 .restaurantId(new RestaurantId(createOrderCommand.getRestaurantId()))

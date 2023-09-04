@@ -114,7 +114,7 @@ public class Order extends AggregateRoot<OrderId> {
 
         if (!price.equals(orderItemsTotal)) {
             throw new OrderDomainException(
-                    "Общая стоимость {0} не равна общей сумме товаров в заказе: {1}.".formatted(
+                    "Общая стоимость %s не равна общей сумме товаров в заказе: %s.".formatted(
                             price.getAmount(), orderItemsTotal.getAmount())
             );
         }
@@ -123,7 +123,7 @@ public class Order extends AggregateRoot<OrderId> {
     private void validateItemsPrice(OrderItem orderItem) {
         if (!orderItem.isPriceValid()) {
             throw new OrderDomainException(
-                    "Order item price: {0} is not valid for product {1}.".formatted(
+                    "Цена заказа: %s не действительная для товара %s.".formatted(
                             orderItem.getPrice().getAmount(),
                             orderItem.getProduct().getId().getValue())
             );
