@@ -2,4 +2,7 @@ version: '3.7'
 
 networks:
   food-ordering-system:
+    # Режимы работы сетей в Docker
+    # Docker позволяет использовать 5 режимов сети: bridge, overlay, host, none, macvlan.
+    # bridge используется для коммуникации контейнеров в пределах одного хоста.
     driver: bridge

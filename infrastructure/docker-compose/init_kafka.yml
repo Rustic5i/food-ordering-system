@@ -5,16 +5,19 @@ services:
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
+      # Дожидаемся доступности Kafka
       # block until kafka is reachable
       kafka-topics --bootstrap-server kafka-broker-1:9092 --list
 
+      #Удаления топиков из кафки      
       echo -e 'Deleting kafka topics'
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-request --delete --if-exists
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-response --delete --if-exists
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic restaurant-approval-request --delete --if-exists
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic restaurant-approval-response --delete --if-exists
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic customer --delete --if-exists
-
+      
+      #Создание топиков в кафке
       echo -e 'Creating kafka topics'
       kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-request --replication-factor 3 --partitions 3
       kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-response --replication-factor 3 --partitions 3
