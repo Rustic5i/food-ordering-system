@@ -33,6 +33,9 @@
                 <artifactId>spring-kafka</artifactId>
                 <version>${spring-kafka.version}</version>
             </dependency>
+
+<!--            Сериализация данных — это метод преобразования данных
+                в двоичный или текстовый формат-->
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-avro-serializer</artifactId>
