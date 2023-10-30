@@ -30,4 +30,8 @@ public class PaymentResponse {
     private PaymentStatus paymentStatus;
 
     private List<String> failureMessage;
+
+    private Instant createdAt;
+
+    private List<String> failureMessages;
 }
