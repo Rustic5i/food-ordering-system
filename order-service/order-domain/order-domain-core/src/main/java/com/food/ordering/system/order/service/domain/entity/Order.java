@@ -29,6 +29,8 @@ public class Order extends AggregateRoot<OrderId> {
     private OrderStatus orderStatus;
     private List<String> failureMessages;
 
+    public static final String FAILURE_MESSAGE_DELIMITER = ",";
+
     /**
      * Инициализировать заказ
      */
@@ -211,7 +213,7 @@ public class Order extends AggregateRoot<OrderId> {
         private Builder() {
         }
 
-        public Builder id(OrderId val) {
+        public Builder orderId(OrderId val) {
             orderId = val;
             return this;
         }

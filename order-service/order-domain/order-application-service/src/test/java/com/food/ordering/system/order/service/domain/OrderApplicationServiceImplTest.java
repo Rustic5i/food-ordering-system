@@ -184,6 +184,6 @@ class OrderApplicationServiceImplTest {
                 .thenReturn(Optional.of(restaurantResponse));
         OrderDomainException orderDomainException = assertThrows(OrderDomainException.class,
                 () -> orderApplicationService.createOrder(createOrderCommand));
-        assertEquals("Ресторан с id: " + RESTAURANT_ID + " в настоящее время не активен", orderDomainException.getMessage());
+        assertEquals("Ресторан с orderId: " + RESTAURANT_ID + " в настоящее время не активен", orderDomainException.getMessage());
     }
 }

@@ -31,7 +31,7 @@ public class OrderTrackCommandHandler {
         Optional<Order> orderResult =
                 orderRepository.findByTrackingId(new TrackingId(trackOrderQuery.getOrderTrackingId()));
         if (orderResult.isEmpty()) {
-            String errorMessage = "Не удалось найти заказ с id %s".formatted(trackOrderQuery.getOrderTrackingId());
+            String errorMessage = "Не удалось найти заказ с orderId %s".formatted(trackOrderQuery.getOrderTrackingId());
             log.warn(errorMessage);
             throw new OrderNotFoundException(errorMessage);
         }

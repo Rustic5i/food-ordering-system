@@ -52,7 +52,7 @@ public class OrderCreateHelper {
         Order order = orderDataMapper.createOrderCommandToOrder(createOrderCommand);
         OrderCreatedEvent orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);
         saveOrder(order);
-        log.info("Заказ создан с id: {}", orderCreatedEvent.getOrder().getId().getValue());
+        log.info("Заказ создан с orderId: {}", orderCreatedEvent.getOrder().getId().getValue());
         return orderCreatedEvent;
     }
 
@@ -60,7 +60,7 @@ public class OrderCreateHelper {
         Restaurant restaurant = orderDataMapper.createOrderCommandToRestaurant(createOrderCommand);//TODO: переделать
         Optional<Restaurant> optionalRestaurant = restaurantRepository.findRestaurantInformation(restaurant);
         if (optionalRestaurant.isEmpty()) {
-            String errorMessage = "Не удалось найти ресторан с id: %s".formatted(createOrderCommand.getRestaurantId());
+            String errorMessage = "Не удалось найти ресторан с orderId: %s".formatted(createOrderCommand.getRestaurantId());
             log.warn(errorMessage);
             throw new OrderDomainException(errorMessage);
         }
@@ -70,7 +70,7 @@ public class OrderCreateHelper {
     private void checkCustomer(UUID customerId) {
         Optional<Customer> customer = customerRepository.findCustomer(customerId);
         if (customer.isEmpty()) {
-            String errorMessage = "Не удалось найти клиента с id: %s".formatted(customerId);
+            String errorMessage = "Не удалось найти клиента с orderId: %s".formatted(customerId);
             log.warn(errorMessage);
             throw new OrderDomainException(errorMessage);
         }
@@ -84,7 +84,7 @@ public class OrderCreateHelper {
             log.error(errorMessage);
             throw new OrderDomainException(errorMessage);
         }
-        log.info("Заказ с id: {} был сохранен", orderResult.getId());
+        log.info("Заказ с orderId: {} был сохранен", orderResult.getId());
         return orderResult;
     }
 }

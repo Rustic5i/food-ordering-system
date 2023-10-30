@@ -25,39 +25,39 @@ public class OrderDomainServiceImpl implements OrderDomainService {
         setOrderProductInformation(order, restaurant);
         order.validateOrder();
         order.initializedOrder();
-        log.info("Заказ с id: {} был инициализирован", order.getId().getValue());
+        log.info("Заказ с orderId: {} был инициализирован", order.getId().getValue());
         return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
     }
 
     @Override
     public OrderPaidEvent payOrder(Order order) {
         order.pay();
-        log.info("Заказ с id: {} оплачен", order.getId().getValue());
+        log.info("Заказ с orderId: {} оплачен", order.getId().getValue());
         return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
     }
 
     @Override
     public void approveOrder(Order order) {
         order.approve();
-        log.info("Заказ с id: {} был одобрен", order.getId().getValue());
+        log.info("Заказ с orderId: {} был одобрен", order.getId().getValue());
     }
 
     @Override
     public OrderCancelledEvent cancelOrderPayment(Order order, List<String> failureMessages) {
         order.initCancel(failureMessages);
-        log.info("Отмена оплаты для заказа с id: {}", order.getId().getValue());
+        log.info("Отмена оплаты для заказа с orderId: {}", order.getId().getValue());
         return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
     }
 
     @Override
     public void cancelOrder(Order order, List<String> failureMessages) {
         order.cancel(failureMessages);
-        log.info("Заказ с id: {} был отменен", order.getId().getValue());
+        log.info("Заказ с orderId: {} был отменен", order.getId().getValue());
     }
 
     private void validateRestaurant(Restaurant restaurant) {
         if (!restaurant.isActive()) {
-            throw new OrderDomainException("Ресторан с id: %s в настоящее время не активен".formatted(restaurant.getId().getValue()));
+            throw new OrderDomainException("Ресторан с orderId: %s в настоящее время не активен".formatted(restaurant.getId().getValue()));
         }
     }
 
