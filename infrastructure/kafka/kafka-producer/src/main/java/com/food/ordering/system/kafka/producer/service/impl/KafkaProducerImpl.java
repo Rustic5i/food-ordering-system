@@ -13,6 +13,8 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.io.Serializable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 @Slf4j
 @Component
@@ -25,11 +27,11 @@ public class KafkaProducerImpl<K extends Serializable, V extends SpecificRecordB
     }
 
     @Override
-    public void send(String topicName, K key, V message, ListenableFutureCallback<SendResult<K, V>> callback) {
+    public void send(String topicName, K key, V message,  BiConsumer<? super SendResult<K, V>, ? super Throwable> callback) {
         log.info("Отправка сообщения={} в топик={}", message, topicName);
         try {
-            ListenableFuture<SendResult<K, V>> kafkaResultFuture = kafkaTemplate.send(topicName, key, message);
-            kafkaResultFuture.addCallback(callback);
+            CompletableFuture<SendResult<K, V>> kafkaResultFuture = kafkaTemplate.send(topicName, key, message);
+            kafkaResultFuture.whenComplete(callback);
         } catch (KafkaException e) {
             log.error("Ошибка продюсера Kafka с ключом: {}, сообщением: {} и исключением: {}", key, message,
                     e.getMessage());
