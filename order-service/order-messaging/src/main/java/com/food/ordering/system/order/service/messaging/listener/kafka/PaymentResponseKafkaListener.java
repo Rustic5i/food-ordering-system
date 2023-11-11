@@ -5,8 +5,8 @@ import com.food.ordering.system.kafka.order.avro.model.PaymentResponseAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.PaymentStatus;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.payment.PaymentResponseMessageListener;
 import com.food.ordering.system.order.service.messaging.mapper.OrderMessagingDataMapper;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -19,18 +19,12 @@ import java.util.List;
  * Слушатель кафка оплата заказа
  */
 @Slf4j
+@AllArgsConstructor
 @Component
 public class PaymentResponseKafkaListener implements KafkaConsumer<PaymentResponseAvroModel> {
 
     private final PaymentResponseMessageListener paymentResponseMessageListener;
     private final OrderMessagingDataMapper orderMessagingDataMapper;
-
-    @Autowired
-    public PaymentResponseKafkaListener(PaymentResponseMessageListener paymentResponseMessageListener,
-                                        OrderMessagingDataMapper orderMessagingDataMapper) {
-        this.paymentResponseMessageListener = paymentResponseMessageListener;
-        this.orderMessagingDataMapper = orderMessagingDataMapper;
-    }
 
     @Override
     @KafkaListener(id = "${kafka-consumer-config.payment-consumer-group-id}",
