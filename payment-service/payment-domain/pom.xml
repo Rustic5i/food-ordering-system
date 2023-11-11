@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>payment-domain-core</module>
-        <module>payment-domain-service</module>
+        <module>payment-application-service</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 

@@ -11,8 +11,9 @@ public interface PaymentDomainService {
 
     /**
      * Проверка инициирования платежа
-     * @param payment платеж
-     * @param creditEntry кредит
+     *
+     * @param payment         платеж
+     * @param creditEntry     кредит
      * @param creditHistories история кредита
      * @param failureMessages список сообщений об ошибках
      * @return
@@ -24,8 +25,9 @@ public interface PaymentDomainService {
 
     /**
      * Проверка отмены платежа
-     * @param payment платеж
-     * @param creditEntry кредит
+     *
+     * @param payment         платеж
+     * @param creditEntry     кредит
      * @param creditHistories история кредита
      * @param failureMessages список сообщений об ошибках
      * @return
