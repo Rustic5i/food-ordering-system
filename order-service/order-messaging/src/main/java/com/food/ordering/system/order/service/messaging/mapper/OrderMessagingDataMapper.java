@@ -8,7 +8,7 @@ import com.food.ordering.system.kafka.order.avro.model.Product;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalRequestAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalResponseAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantOrderStatus;
-import com.food.ordering.system.order.service.domain.dto.message.OrderApprovalStatus;
+import com.food.ordering.system.domain.valueobject.OrderApprovalStatus;
 import com.food.ordering.system.order.service.domain.dto.message.RestaurantApprovalResponse;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.event.OrderCancelledEvent;
