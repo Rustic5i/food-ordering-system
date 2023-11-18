@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "order_address")
+@Table(name = "credit_entry")
 @Entity
 public class CreditEntryEntity {
 
