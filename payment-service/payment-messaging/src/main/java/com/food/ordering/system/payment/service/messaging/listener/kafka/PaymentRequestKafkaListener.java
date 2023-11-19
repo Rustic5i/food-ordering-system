@@ -30,23 +30,27 @@ public class PaymentRequestKafkaListener implements KafkaConsumer<PaymentRequest
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
                         @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
-        log.info("{} number of payment requests received with keys:{}, partitions:{} and offsets: {}",
-                messages.size(),
-                keys.toString(),
-                partitions.toString(),
-                offsets.toString());
+        try {
+            log.info("{} number of payment requests received with keys:{}, partitions:{} and offsets: {}",
+                    messages.size(),
+                    keys.toString(),
+                    partitions.toString(),
+                    offsets.toString());
 
-        messages.forEach(paymentRequestAvroModel -> {
-            if (PaymentOrderStatus.PENDING == paymentRequestAvroModel.getPaymentOrderStatus()) {
-                log.info("Processing payment for order id: {}", paymentRequestAvroModel.getOrderId());
-                paymentRequestMessageListener.completePayment(paymentMessagingDataMapper
-                        .paymentRequestAvroModelToPaymentRequest(paymentRequestAvroModel));
-            } else if(PaymentOrderStatus.CANCELLED == paymentRequestAvroModel.getPaymentOrderStatus()) {
-                log.info("Cancelling payment for order id: {}", paymentRequestAvroModel.getOrderId());
-                paymentRequestMessageListener.cancelPayment(paymentMessagingDataMapper
-                        .paymentRequestAvroModelToPaymentRequest(paymentRequestAvroModel));
-            }
-        });
+            messages.forEach(paymentRequestAvroModel -> {
+                if (PaymentOrderStatus.PENDING == paymentRequestAvroModel.getPaymentOrderStatus()) {
+                    log.info("Processing payment for order id: {}", paymentRequestAvroModel.getOrderId());
+                    paymentRequestMessageListener.completePayment(paymentMessagingDataMapper
+                            .paymentRequestAvroModelToPaymentRequest(paymentRequestAvroModel));
+                } else if (PaymentOrderStatus.CANCELLED == paymentRequestAvroModel.getPaymentOrderStatus()) {
+                    log.info("Cancelling payment for order id: {}", paymentRequestAvroModel.getOrderId());
+                    paymentRequestMessageListener.cancelPayment(paymentMessagingDataMapper
+                            .paymentRequestAvroModelToPaymentRequest(paymentRequestAvroModel));
+                }
+            });
+        } catch (Exception e) {
+            log.info("Ошибка при обработке события {}", e.getMessage());
+        }
 
     }
 }

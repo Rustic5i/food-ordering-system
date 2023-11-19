@@ -42,29 +42,32 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
                         @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
 
-        log.info("{} number of restaurant approval responses received with keys: {}, partitions: {} and offsets: {}",
-                messages.size(),
-                keys.toString(),
-                partitions.toString(),
-                offsets.toString());
+        try {
+            log.info("{} number of restaurant approval responses received with keys: {}, partitions: {} and offsets: {}",
+                    messages.size(),
+                    keys.toString(),
+                    partitions.toString(),
+                    offsets.toString());
+            messages.forEach(restaurantApprovalResponseAvroModel -> {
+                if (OrderApprovalStatus.APPROVED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
 
-        messages.forEach(restaurantApprovalResponseAvroModel -> {
-            if (OrderApprovalStatus.APPROVED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
+                    log.info("Processing approved order for order id: {}",
+                            restaurantApprovalResponseAvroModel.getOrderId());
+                    restaurantApprovalResponseMessagesListener.orderApproved(orderMessagingDataMapper
+                            .approvalResponseAvroModelToApprovalResponse(restaurantApprovalResponseAvroModel));
 
-                log.info("Processing approved order for order id: {}",
-                        restaurantApprovalResponseAvroModel.getOrderId());
-                restaurantApprovalResponseMessagesListener.orderApproved(orderMessagingDataMapper
-                        .approvalResponseAvroModelToApprovalResponse(restaurantApprovalResponseAvroModel));
+                } else if (OrderApprovalStatus.REJECTED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
 
-            } else if (OrderApprovalStatus.REJECTED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
-
-                log.info("Processing rejected order for order id: {}, with failure message: {}",
-                        restaurantApprovalResponseAvroModel.getOrderId(),
-                        String.join(FAILURE_MESSAGE_DELIMITER,
-                                restaurantApprovalResponseAvroModel.getFailureMessages()));
-                restaurantApprovalResponseMessagesListener.orderRejected(orderMessagingDataMapper
-                        .approvalResponseAvroModelToApprovalResponse(restaurantApprovalResponseAvroModel));
-            }
-        });
+                    log.info("Processing rejected order for order id: {}, with failure message: {}",
+                            restaurantApprovalResponseAvroModel.getOrderId(),
+                            String.join(FAILURE_MESSAGE_DELIMITER,
+                                    restaurantApprovalResponseAvroModel.getFailureMessages()));
+                    restaurantApprovalResponseMessagesListener.orderRejected(orderMessagingDataMapper
+                            .approvalResponseAvroModelToApprovalResponse(restaurantApprovalResponseAvroModel));
+                }
+            });
+        } catch (Exception e) {
+            log.info("Ошибка при обработке события {}", e.getMessage());
+        }
     }
 }

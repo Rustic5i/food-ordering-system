@@ -34,28 +34,32 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<PaymentRespon
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
                         @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
 
-        log.info("{} number of payment responses received with keys: {}, partitions: {} and offsets: {}",
-                messages.size(),
-                keys.toString(),
-                partitions.toString(),
-                offsets.toString());
+        try {
+            log.info("{} number of payment responses received with keys: {}, partitions: {} and offsets: {}",
+                    messages.size(),
+                    keys.toString(),
+                    partitions.toString(),
+                    offsets.toString());
 
-        messages.forEach(paymentResponseAvroModel -> {
-            if (PaymentStatus.COMPLETED == paymentResponseAvroModel.getPaymentStatus()) {
+            messages.forEach(paymentResponseAvroModel -> {
+                if (PaymentStatus.COMPLETED == paymentResponseAvroModel.getPaymentStatus()) {
 
-                log.info("Processing successful payment for order id: {}", paymentResponseAvroModel.getOrderId());
+                    log.info("Processing successful payment for order id: {}", paymentResponseAvroModel.getOrderId());
 
-                paymentResponseMessageListener.paymentCompleted(orderMessagingDataMapper
-                        .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));
+                    paymentResponseMessageListener.paymentCompleted(orderMessagingDataMapper
+                            .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));
 
-            } else if (PaymentStatus.CANCELLED == paymentResponseAvroModel.getPaymentStatus()
-                    || PaymentStatus.FAILED == paymentResponseAvroModel.getPaymentStatus()) {
+                } else if (PaymentStatus.CANCELLED == paymentResponseAvroModel.getPaymentStatus()
+                        || PaymentStatus.FAILED == paymentResponseAvroModel.getPaymentStatus()) {
 
-                log.info("Processing unsuccessful payment for order id: {}", paymentResponseAvroModel.getOrderId());
+                    log.info("Processing unsuccessful payment for order id: {}", paymentResponseAvroModel.getOrderId());
 
-                paymentResponseMessageListener.paymentCancelled(orderMessagingDataMapper
-                        .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));
-            }
-        });
+                    paymentResponseMessageListener.paymentCancelled(orderMessagingDataMapper
+                            .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));
+                }
+            });
+        } catch (Exception e) {
+            log.info("Ошибка при обработке события {}", e.getMessage());
+        }
     }
 }
