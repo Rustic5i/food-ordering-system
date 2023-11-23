@@ -3,7 +3,6 @@ package com.food.ordering.system.order.service.domain;
 import com.food.ordering.system.domain.valueobject.PaymentResponse;
 import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.payment.PaymentResponseMessageListener;
-import com.food.ordering.system.order.service.domain.ports.output.message.publisher.restaurantapproval.OrderPaidRestaurantRequestMessagePublisher;
 import com.food.ordering.system.order.service.domain.saga.OrderPaymentSaga;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

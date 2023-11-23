@@ -10,6 +10,7 @@ import com.food.ordering.system.order.service.domain.mapper.OrderDataMapper;
 import com.food.ordering.system.order.service.domain.ports.output.repository.CustomerRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.OrderRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.RestaurantRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.UUID;
  * Сервис отвечающий за создание заказа
  */
 @Slf4j
+@AllArgsConstructor
 @Component
 public class OrderCreateHelper {
 
@@ -34,20 +36,8 @@ public class OrderCreateHelper {
 
     private final OrderDataMapper orderDataMapper;
 
-    public OrderCreateHelper(OrderDomainService orderDomainService,
-            OrderRepository orderRepository,
-            CustomerRepository customerRepository,
-            RestaurantRepository restaurantRepository,
-            OrderDataMapper orderDataMapper) {
-        this.orderDomainService = orderDomainService;
-        this.orderRepository = orderRepository;
-        this.customerRepository = customerRepository;
-        this.restaurantRepository = restaurantRepository;
-        this.orderDataMapper = orderDataMapper;
-    }
-
     @Transactional
-    public OrderCreatedEvent persistOrder(CreateOrderCommand createOrderCommand){
+    public OrderCreatedEvent persistOrder(CreateOrderCommand createOrderCommand) {
         Restaurant restaurant = checkRestaurant(createOrderCommand);
         Order order = orderDataMapper.createOrderCommandToOrder(createOrderCommand);
         OrderCreatedEvent orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);

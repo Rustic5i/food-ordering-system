@@ -28,6 +28,8 @@
     <properties>
         <java.version>20</java.version>
         <maven-compiler-plugin-version>3.11.0</maven-compiler-plugin-version>
+        <apache-commons-lang3.version>3.14.0</apache-commons-lang3.version>
+        <apache-commons-collections4.version>4.4</apache-commons-collections4.version>
         <mockito.version>5.2.0</mockito.version>
         <spring-kafka.version>3.0.12</spring-kafka.version>
         <kafka-avro-serializer.version>7.0.1</kafka-avro-serializer.version>
@@ -164,6 +166,16 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache-commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${apache-commons-collections4.version}</version>
         </dependency>
     </dependencies>
 
