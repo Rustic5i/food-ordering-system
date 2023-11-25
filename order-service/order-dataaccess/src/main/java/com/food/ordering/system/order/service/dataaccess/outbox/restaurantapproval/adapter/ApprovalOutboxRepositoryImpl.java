@@ -36,16 +36,16 @@ public class ApprovalOutboxRepositoryImpl implements ApprovalOutboxRepository {
     }
 
     @Override
-    public Optional<List<OrderApprovalOutboxMessage>> findByTypeAndOutboxStatusAndSagaStatus(String sagaType,
+    public List<OrderApprovalOutboxMessage> findByTypeAndOutboxStatusAndSagaStatus(String sagaType,
                                                                                        OutboxStatus outboxStatus,
                                                                        SagaStatus... sagaStatus) {
-        return Optional.of(approvalOutboxJpaRepository.findByTypeAndOutboxStatusAndSagaStatusIn(sagaType, outboxStatus,
+        return approvalOutboxJpaRepository.findByTypeAndOutboxStatusAndSagaStatusIn(sagaType, outboxStatus,
                 Arrays.asList(sagaStatus))
                 .orElseThrow(() -> new ApprovalOutboxNotFoundException("Approval outbox object " +
                         "could be found for saga type " + sagaType))
                 .stream()
                 .map(approvalOutboxDataAccessMapper::approvalOutboxEntityToOrderApprovalOutboxMessage)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 
     @Override
