@@ -34,7 +34,7 @@ public class OrderSagaHelper {
         orderRepository.save(order);
     }
 
-    SagaStatus orderStatusToSagaStatus(OrderStatus orderStatus){
+    public SagaStatus orderStatusToSagaStatus(OrderStatus orderStatus){
         return switch (orderStatus){
             case PAID -> SagaStatus.PROCESSING;
             case APPROVED -> SagaStatus.SUCCEEDED;

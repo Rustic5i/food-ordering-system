@@ -1,7 +1,6 @@
 package com.food.ordering.system.order.service.domain;
 
 import com.food.ordering.system.domain.valueobject.PaymentResponse;
-import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.payment.PaymentResponseMessageListener;
 import com.food.ordering.system.order.service.domain.saga.OrderPaymentSaga;
 import lombok.AllArgsConstructor;
@@ -18,13 +17,11 @@ import static com.food.ordering.system.order.service.domain.entity.Order.FAILURE
 public class PaymentResponseMessageListenerImpl implements PaymentResponseMessageListener {
 
     private final OrderPaymentSaga orderPaymentSaga;
-    private final OrderPaidRestaurantRequestMessagePublisher orderPaidRestaurantRequestMessagePublisher;
 
     @Override
     public void paymentCompleted(PaymentResponse paymentResponse) {
-        OrderPaidEvent orderPaidEvent = orderPaymentSaga.process(paymentResponse);
-        log.info("Publishing OrderPaidEvent for order id: {}", paymentResponse.getOrderId());
-        fireEvent(orderPaidEvent);
+        orderPaymentSaga.process(paymentResponse);
+        log.info("Order Payment Saga process operation is completed for order id: {}", paymentResponse.getOrderId());
     }
 
     @Override
@@ -33,9 +30,5 @@ public class PaymentResponseMessageListenerImpl implements PaymentResponseMessag
         log.info("Order is roll backend for id: {} with failure messages: {}",
                 paymentResponse.getOrderId(), String.join(FAILURE_MESSAGE_DELIMITER,
                         paymentResponse.getFailureMessage()));
-    }
-
-    private void fireEvent(OrderPaidEvent orderPaidEvent) {
-        orderPaidRestaurantRequestMessagePublisher.publish(orderPaidEvent);
     }
 }

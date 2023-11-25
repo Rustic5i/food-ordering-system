@@ -22,7 +22,7 @@ public class OrderApprovalEventPayload {
     @JsonProperty
     private ZonedDateTime createdAt;
     @JsonProperty
-    private String restaurantStatus;
+    private String restaurantOrderStatus;
     @JsonProperty
     private List<OrderApprovalEventProduct> products;
 }

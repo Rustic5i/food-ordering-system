@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,7 +40,7 @@ public class PaymentOutboxScheduler implements OutboxScheduler {
                     outboxMessagesResponse.stream().map(outboxMessage ->
                             outboxMessage.getId().toString()).collect(Collectors.joining(",")));
             outboxMessagesResponse.forEach(outboxMessage ->
-                            paymentRequestMessagePublisher.publish(outboxMessage, this::updateOutboxStatus));
+                    paymentRequestMessagePublisher.publish(outboxMessage, this::updateOutboxStatus));
             log.info("{} OrderPaymentOutboxMessage sent to message bus!", outboxMessagesResponse.size());
         }
 
