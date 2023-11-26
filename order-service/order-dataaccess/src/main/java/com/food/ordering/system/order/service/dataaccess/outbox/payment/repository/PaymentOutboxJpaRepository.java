@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface PaymentOutboxJpaRepository extends JpaRepository<PaymentOutboxEntity, UUID> {
 
-    Optional<List<PaymentOutboxEntity>> findByTypeAndOutboxStatusAndSagaStatusIn(String type,
+    List<PaymentOutboxEntity> findByTypeAndOutboxStatusAndSagaStatusIn(String type,
                                                                                  OutboxStatus outboxStatus,
                                                                                  List<SagaStatus> sagaStatus);
 

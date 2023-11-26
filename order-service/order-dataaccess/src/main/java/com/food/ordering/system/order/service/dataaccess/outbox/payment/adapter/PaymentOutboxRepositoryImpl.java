@@ -9,6 +9,7 @@ import com.food.ordering.system.order.service.domain.ports.output.repository.Pay
 import com.food.ordering.system.outbox.OutboxStatus;
 import com.food.ordering.system.saga.SagaStatus;
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -35,11 +36,15 @@ public class PaymentOutboxRepositoryImpl implements PaymentOutboxRepository {
     public List<OrderPaymentOutboxMessage> findByTypeAndOutboxStatusAndSagaStatus(String sagaType,
                                                                                   OutboxStatus outboxStatus,
                                                                                   SagaStatus... sagaStatus) {
-        return paymentOutboxJpaRepository.findByTypeAndOutboxStatusAndSagaStatusIn(sagaType,
-                        outboxStatus,
-                        Arrays.asList(sagaStatus))
-                .orElseThrow(() -> new PaymentOutboxNotFoundException("Payment outbox object " +
-                        "could not be found for saga type " + sagaType))
+        List<PaymentOutboxEntity> paymentOutboxEntities = paymentOutboxJpaRepository.findByTypeAndOutboxStatusAndSagaStatusIn(sagaType,
+                outboxStatus,
+                Arrays.asList(sagaStatus));
+        if (CollectionUtils.isEmpty(paymentOutboxEntities)) {
+            String errorMessage = "Не найден PaymentOutboxEntity с типом саги: {} "
+                    .formatted(sagaType);
+            throw new PaymentOutboxNotFoundException(errorMessage);
+        }
+        return paymentOutboxEntities
                 .stream()
                 .map(mapper::paymentOutboxEntityToOrderPaymentOutboxMessage)
                 .collect(Collectors.toList());
