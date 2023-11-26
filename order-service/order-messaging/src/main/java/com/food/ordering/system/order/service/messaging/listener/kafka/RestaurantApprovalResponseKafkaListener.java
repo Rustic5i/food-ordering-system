@@ -3,10 +3,12 @@ package com.food.ordering.system.order.service.messaging.listener.kafka;
 import com.food.ordering.system.kafka.consumer.KafkaConsumer;
 import com.food.ordering.system.kafka.order.avro.model.OrderApprovalStatus;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalResponseAvroModel;
+import com.food.ordering.system.order.service.domain.exception.OrderNotFoundException;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.restaurantapproval.RestaurantApprovalResponseMessagesListener;
 import com.food.ordering.system.order.service.messaging.mapper.OrderMessagingDataMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -42,13 +44,13 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
                         @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
 
-        try {
-            log.info("{} number of restaurant approval responses received with keys: {}, partitions: {} and offsets: {}",
-                    messages.size(),
-                    keys.toString(),
-                    partitions.toString(),
-                    offsets.toString());
-            messages.forEach(restaurantApprovalResponseAvroModel -> {
+        log.info("{} number of restaurant approval responses received with keys: {}, partitions: {} and offsets: {}",
+                messages.size(),
+                keys.toString(),
+                partitions.toString(),
+                offsets.toString());
+        messages.forEach(restaurantApprovalResponseAvroModel -> {
+            try {
                 if (OrderApprovalStatus.APPROVED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
 
                     log.info("Processing approved order for order id: {}",
@@ -65,9 +67,14 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
                     restaurantApprovalResponseMessagesListener.orderRejected(orderMessagingDataMapper
                             .approvalResponseAvroModelToApprovalResponse(restaurantApprovalResponseAvroModel));
                 }
-            });
-        } catch (Exception e) {
-            log.info("Ошибка при обработке события {}", e.getMessage());
-        }
+            } catch (OptimisticLockingFailureException e) {
+                log.error("Обнаружено исключение оптимистической блокировки в RestaurantApprovalResponseKafkaListener для идентификатора заказа: {}.",
+                        restaurantApprovalResponseAvroModel.getOrderId());
+            } catch (OrderNotFoundException e) {
+                log.error("Заказ по идентификатору заказа не найден: {}", restaurantApprovalResponseAvroModel.getOrderId());
+            } catch (Exception e) {
+                log.error("Ошибка при обработке события {}", e.getMessage());
+            }
+        });
     }
 }

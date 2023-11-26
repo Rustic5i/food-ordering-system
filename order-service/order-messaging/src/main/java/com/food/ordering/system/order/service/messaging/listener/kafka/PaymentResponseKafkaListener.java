@@ -3,10 +3,12 @@ package com.food.ordering.system.order.service.messaging.listener.kafka;
 import com.food.ordering.system.kafka.consumer.KafkaConsumer;
 import com.food.ordering.system.kafka.order.avro.model.PaymentResponseAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.PaymentStatus;
+import com.food.ordering.system.order.service.domain.exception.OrderNotFoundException;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.payment.PaymentResponseMessageListener;
 import com.food.ordering.system.order.service.messaging.mapper.OrderMessagingDataMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -34,14 +36,14 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<PaymentRespon
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
                         @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
 
-        try {
-            log.info("{} number of payment responses received with keys: {}, partitions: {} and offsets: {}",
-                    messages.size(),
-                    keys.toString(),
-                    partitions.toString(),
-                    offsets.toString());
+        log.info("{} number of payment responses received with keys: {}, partitions: {} and offsets: {}",
+                messages.size(),
+                keys.toString(),
+                partitions.toString(),
+                offsets.toString());
 
-            messages.forEach(paymentResponseAvroModel -> {
+        messages.forEach(paymentResponseAvroModel -> {
+            try {
                 if (PaymentStatus.COMPLETED == paymentResponseAvroModel.getPaymentStatus()) {
 
                     log.info("Processing successful payment for order id: {}", paymentResponseAvroModel.getOrderId());
@@ -57,9 +59,15 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<PaymentRespon
                     paymentResponseMessageListener.paymentCancelled(orderMessagingDataMapper
                             .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));
                 }
-            });
-        } catch (Exception e) {
-            log.info("Ошибка при обработке события {}", e.getMessage());
-        }
+            } catch (OptimisticLockingFailureException e) {
+                log.error("Обнаружено исключение оптимистической блокировки в PaymentResponseKafkaListener для идентификатора заказа: {}.",
+                        paymentResponseAvroModel.getOrderId());
+            } catch (OrderNotFoundException e) {
+                log.error("Заказ по идентификатору заказа не найден: {}", paymentResponseAvroModel.getOrderId());
+            } catch (Exception e) {
+                log.error("Ошибка при обработке события {}", e.getMessage());
+            }
+        });
+
     }
 }
